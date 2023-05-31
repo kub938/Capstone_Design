@@ -1,0 +1,9 @@
+.Container {
+    border: 1px solid gray;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+
+    flex-direction: column;
+    align-content: space-evenly;
+}
