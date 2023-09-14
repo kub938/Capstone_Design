@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Noto+Sans+KR:wght@700&display=swap');
 
+
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +9,20 @@
 
 }
 
-main {
+/* 스크롤바 없애기 */
+/* body {
+    -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+} */
+
+
+/* Home */
+main {}
+
+.back_Ground {
     height: 95.4vh;
     width: 100vw;
     background-Image: url("../../assets/mainPage.jpg");
@@ -15,6 +30,8 @@ main {
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+
 
 .Main {
     display: flex;
@@ -25,7 +42,7 @@ main {
 }
 
 .content_Font {
-    font-size: 70px;
+    font-size: 5vmax;
     color: rgb(255, 255, 255);
     font-family: 'Noto Sans KR', sans-serif;
 }
@@ -35,7 +52,7 @@ main {
 /* input form */
 
 .form {
-    margin-top: 10em;
+    margin-top: 5vmax;
     margin-bottom: 10em;
 }
 
@@ -44,7 +61,6 @@ main {
     clear: both;
     display: table;
 }
-
 
 
 .input_Data {
@@ -65,9 +81,7 @@ main {
     font-size: 17px;
     background-color: rgb(128, 207, 207);
     border-left: none;
-    /* Prevent double borders */
     cursor: pointer;
-
     border-radius: 0 20px 20px 0;
     border: 1px solid rgb(128, 207, 207);
 
