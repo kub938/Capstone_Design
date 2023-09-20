@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    height: 100vh;
+    justify-content: left;
+    align-items: stretch;
+}
+
+
+
+.map {
+    flex-grow: 1;
+}

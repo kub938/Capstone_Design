@@ -1,0 +1,22 @@
+.mapInfo {
+    width: 450px;
+    height: 100vh;
+    border: 1px solid rgba(99, 97, 97, 0.242);
+}
+
+.btnStyle {
+    width: 18%;
+    padding: 5px;
+    color: white;
+    font-size: 17px;
+    background-color: rgb(128, 207, 207);
+    cursor: pointer;
+    border-radius: 15px;
+    border: 1px solid rgb(128, 207, 207);
+}
+
+
+.infoContents {
+    margin: 25px 0 25px 25px;
+
+}

@@ -7,25 +7,14 @@ const url = "mongodb+srv://kimyunbae:06PpRagQ2cF75Ri4@capston.z9zpcug.mongodb.ne
 const User = require('./User.cjs')
 const bcrypt = require('bcrypt');
 const path = require('path');
+const axios = require('axios')
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 ///--------------------------------------------------------------
 mongoose.connect(url)
-
-async function run() {
-    User.create({ name: "Kyle", age: 26 })
-        .then(user => {
-            console.log('User created:', user);
-        })
-        .catch(err => {
-            console.error('Error creating user:', err);
-        });
-}
-
-run()
-
 
 
 app.post('/api/signup', async (req, res) => {
@@ -109,6 +98,72 @@ app.get('/api/users', (req, res) => {
             res.status(500).json({ error: 'An error occurred while retrieving the users' });  // Send an error message if there's a problem
         });
 });
+
+
+
+//-----------------------------------------------------------
+//검색 데이터 뽑기
+const dataStore = []
+
+app.post('/api/mainsearch', async (req, res) => {
+    const name = req.body.name;
+    try {
+        dataStore.push(name);
+        console.log('서버 데이터 수신 완료', dataStore);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: '검색 오류' });
+    }
+});
+
+
+
+
+//--------------검색 api 요청----------------------------
+const client_id = 'nBcrF_omljd_AL2WOV0n'
+const client_secret = 'QuroIWuHzI'
+
+const localData = []
+
+app.get('/search/local', async (req, res) => {
+    var api_url = 'https://openapi.naver.com/v1/search/local?query=' + encodeURI(dataStore) + '&display=12&start=1&sort=random'; // JSON 결과
+    var options = {
+        url: api_url,
+        headers: { 'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
+    };
+    try {
+        dataStore.length = 0;
+        const response = await axios.get(api_url, options);
+        console.log(response.data.items);
+        localData.push(response.data.items);
+        // console.log(localData);
+        res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
+        res.end(JSON.stringify(response.data));
+
+    } catch (error) {
+        if (error.response) {
+            // 서버가 2xx 이외의 상태 코드로 응답했을 때
+            console.log('Error', error.response.status);
+            res.status(error.response.status).end();
+        } else if (error.request) {
+            // 요청은 보냈지만 응답을 받지 못했을 때
+            console.log('No response', error.request);
+            res.status(500).end();
+        } else {
+            // 요청 자체가 만들어지지 않았거나 다른 문제가 발생했을 때
+            console.log('Error', error.message);
+            res.status(500).end();
+        }
+    }
+});
+
+
+
+
+
+
+
 
 
 

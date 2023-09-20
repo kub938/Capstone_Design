@@ -38,6 +38,7 @@ body {
     display: flex;
     justify-content: space-between;
     list-style-type: none;
+    margin: 0;
 }
 
 .navElements ul li:not(:last-child) {
