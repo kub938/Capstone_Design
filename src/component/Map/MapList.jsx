@@ -2,19 +2,28 @@ import React, { useState, useEffect, useContext } from 'react';
 import styles from './MapList.module.css';
 import axios from 'axios';
 
-function MapList() {
+function MapList({ placeList, setPlaceList }) {
     const clientId = "nBcrF_omljd_AL2WOV0n"
     const clientSecret = 'QuroIWuHzI'
-    const [placeList, setPlaceList] = useState([])
+    // const [placeList, setPlaceList] = useState([])
     const [local, setLocal] = useState('')
 
-    async function fetchData() {
+    async function fetchData(id) {
         try {
-            const response = await axios.get('http://localhost:4000/search/local');
+            const response = await axios.get(`http://localhost:4000/search/local?id=${id}`);
             setPlaceList(response.data.items);
+            console.log('리스트 데이터 출력 성공');
+
         } catch (error) {
-            console.error(error);
+            console.error('실패', error);
         }
+    }
+
+    const handleButtonClick = async (event) => {
+        event.preventDefault();
+        const currentButtonId = event.target.id;
+
+        fetchData(currentButtonId);
     }
 
     useEffect(() => {
@@ -25,9 +34,9 @@ function MapList() {
         <div>
             <div className={styles.mapInfo}>
                 <form action="" placeholder={placeList}>
-                    <button>식당</button>
-                    <button>놀거리</button>
-                    <button>숙박</button>
+                    <button id='button1' onClick={handleButtonClick}>식당</button>
+                    <button id='button2' onClick={handleButtonClick}>놀거리</button>
+                    <button id='button3' onClick={handleButtonClick}>숙박</button>
                 </form>
                 <hr />
                 <div className={styles.infoContents}>

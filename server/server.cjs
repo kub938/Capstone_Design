@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const axios = require('axios')
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -103,14 +102,13 @@ app.get('/api/users', (req, res) => {
 
 //-----------------------------------------------------------
 //검색 데이터 뽑기
-const dataStore = []
+let dataStore = '';
 
 app.post('/api/mainsearch', async (req, res) => {
     const name = req.body.name;
     try {
-        dataStore.push(name);
-        console.log('서버 데이터 수신 완료', dataStore);
-
+        dataStore = name;
+        res.send(console.log('서버 데이터 수신 완료', dataStore));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: '검색 오류' });
@@ -120,23 +118,38 @@ app.post('/api/mainsearch', async (req, res) => {
 
 
 
-//--------------검색 api 요청----------------------------
+//--------------maplist용 api 요청----------------------------
 const client_id = 'nBcrF_omljd_AL2WOV0n'
 const client_secret = 'QuroIWuHzI'
-
-const localData = []
-
+let roadaddress = ''
+let localData = ''
+let category = ''
 app.get('/search/local', async (req, res) => {
-    var api_url = 'https://openapi.naver.com/v1/search/local?query=' + encodeURI(dataStore) + '&display=12&start=1&sort=random'; // JSON 결과
-    var options = {
+    let buttonId = req.query.id;
+    if (buttonId === 'button1') {
+        category = '식당'
+    }
+    else if (buttonId === 'button2') {
+        category = '관광명소'
+    }
+    else if (buttonId === 'button3') {
+        category = '호텔'
+    }
+    else {
+        category = ''
+    }
+
+    let api_url = 'https://openapi.naver.com/v1/search/local?query=' + encodeURI(dataStore + category) + '&display=12&start=1&sort=random'; // JSON 결과
+    let options = {
         url: api_url,
         headers: { 'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
     };
+
+
+
     try {
-        dataStore.length = 0;
         const response = await axios.get(api_url, options);
-        console.log(response.data.items);
-        localData.push(response.data.items);
+        roadaddress = response.data.items[0].roadAddress
         // console.log(localData);
         res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
         res.end(JSON.stringify(response.data));
@@ -160,12 +173,34 @@ app.get('/search/local', async (req, res) => {
 
 
 
+//---------------지번, 도로명을 사용해 주소 정보 검색----------
+// console.log(roadaddress)
+// roadaddress = roadaddress.replace(/\s/g, "");
+
+app.get('/api/roadAddress', async (req, res) => {
+    var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress)
+    var road_options = {
+        uri: road_url,
+        headers: {
+            "Content-Type": "application/json",
+            "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
+            "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
+        }
+    }
+    try {
+        const response = await axios.get(road_url, road_options);
+        res.json(response.data.addresses);
+        console.log('CoordData 전송 성공')
+    } catch (errorMessage) {
+        console.error('실패', errorMessage);
+    }
+});
 
 
 
 
 
-
+//------------------------------------------------------------
 
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
