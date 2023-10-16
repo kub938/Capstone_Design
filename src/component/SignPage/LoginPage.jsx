@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +14,10 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import loginimage from '../../assets/SignPage.jpg';
 import axios from 'axios';
+import { NavigationRounded } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { LogStateContext } from '../../LogStateContext';
+
 
 function Copyright(props) {
     return (
@@ -28,11 +32,15 @@ function Copyright(props) {
     );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
 export default function LoginPage() {
+    const navigate = useNavigate();
+    const { logstate, setLogState } = useContext(LogStateContext);
+    useEffect(() => {
+        console.log(logstate);
+    }, [logstate]);
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -46,51 +54,21 @@ export default function LoginPage() {
             if (response.status === 200) {
                 // If the login was successful, print a success message
                 console.log('Logged in successfully');
+                setLogState(true);
+                navigate('/');
                 alert('로그인 완료');
+                console.log(logstate);
             } else {
                 // If there was an error, print the error message
                 console.error(`Error during log in: ${response.statusText}`);
             }
 
         } catch (error) {
+            alert('아이디 또는 비밀번호를 확인해주세요')
+
             console.error("Error during login :", error);
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of http.ClientRequest in node.js
-                console.log(error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.log('Error', error.message);
-            }
         }
-        // axios.post('/login', async (req, res) => {
-        //     const user = await User.findOne({ email: req.body.email })
-        //     if (!user) {
-        //         res.status(401).send({ success: false, error: 'Invalid email or password' });
-        //         return;
-        //     }
 
-        //     user.comparePassword(req.body.password, (err, isMatch) => {
-        //         if (!isMatch) {
-        //             res.status(401).send({ success: false, error: 'Invalid email or password' });
-        //             return;
-        //         }
-
-        //         res.send({
-        //             success: true,
-        //             user_info: {
-        //                 user_id: user._id,
-        //                 user_name: user.name
-        //             }
-        //         })
-        //     })
-        // });
     };
 
 

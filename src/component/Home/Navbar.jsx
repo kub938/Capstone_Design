@@ -1,9 +1,16 @@
 import styles from './Navbar.module.css';
 import { NavLink } from 'react-router-dom'
-import { useState } from 'react'
-
+import { useState, useContext } from 'react'
+import { LogStateContext } from '../../LogStateContext';
 
 function Navbar() {
+    const { logstate, setLogState } = useContext(LogStateContext);
+
+    const handleLogout = () => {
+        // 로그아웃 처리 로직...
+        setLogState(false);
+        alert('로그아웃 되었습니다')
+    };
     return (
         <div>
             <nav className={styles.navbar}>
@@ -15,7 +22,10 @@ function Navbar() {
                         <ul>
                             <li><NavLink to="/map">코스추천</NavLink></li>
                             <li><NavLink to="/board">게시판</NavLink></li>
-                            <li><NavLink to="/login" >로그인</NavLink></li>
+                            {!logstate ? (<li><NavLink to="/login" >로그인</NavLink></li>
+                            ) : (
+                                <li><button onClick={handleLogout}>로그아웃</button></li>
+                            )}
                         </ul>
                     </div>
                 </div>

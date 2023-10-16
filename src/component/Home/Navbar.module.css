@@ -67,3 +67,8 @@ body {
     height: 2px;
     background-color: #574c4c;
 }
+
+.navElements ul li button {
+    background-color: transparent;
+    border: none;
+}

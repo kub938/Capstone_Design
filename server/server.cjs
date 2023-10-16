@@ -2,8 +2,9 @@ const express = require('express')
 const cors = require('cors');
 const PORT = 4000
 const app = express()
+const { connectToDb, getDb } = require('./db.cjs')
 const mongoose = require('mongoose');
-const url = "mongodb+srv://kimyunbae:06PpRagQ2cF75Ri4@capston.z9zpcug.mongodb.net/?retryWrites=true&w=majority";
+const url = "mongodb+srv://kub938:qo9331411@cluster0.yif4ztm.mongodb.net/?retryWrites=true&w=majority";
 const User = require('./User.cjs')
 const bcrypt = require('bcrypt');
 const path = require('path');
@@ -13,22 +14,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 ///--------------------------------------------------------------
-mongoose.connect(url)
 
+let db
+
+connectToDb((err) => {
+    if (!err) {
+        console.log("Db connect success")
+        db = getDb()
+    }
+})
 
 app.post('/api/signup', async (req, res) => {
     const { name, email, password } = req.body;
-
     try {
         // 이미 등록된 이메일인지 확인
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ error: '이미 등록된 이메일입니다.' });
         }
+        if (name === "" || email === '' || password === '') {
+            return res.status(500)
+        }
 
         // 새로운 사용자 생성
         const newUser = new User({ name, email, password });
         await newUser.save();
+        console.log("User Saved", newUser)
 
         res.status(201).json(newUser); // Created user data is sent back as response
 
@@ -65,8 +76,8 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        console.log(user.password, password)
+        if (!(user.password === password)) {
             return res.status(402).json({ error: 'Invalid email or password' });
         }
 
@@ -121,7 +132,7 @@ app.post('/api/mainsearch', async (req, res) => {
 //--------------maplist용 api 요청----------------------------
 const client_id = 'nBcrF_omljd_AL2WOV0n'
 const client_secret = 'QuroIWuHzI'
-let roadaddress = ''
+let roadaddress = []
 let localData = ''
 let category = ''
 app.get('/search/local', async (req, res) => {
@@ -149,7 +160,10 @@ app.get('/search/local', async (req, res) => {
 
     try {
         const response = await axios.get(api_url, options);
-        roadaddress = response.data.items[0].roadAddress
+        arrRoad = response.data.items
+        for (let i = 0; i < arrRoad.length; i++) {
+            roadaddress.push(response.data.items[i].address)
+        }
         // console.log(localData);
         res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
         res.end(JSON.stringify(response.data));
@@ -178,24 +192,31 @@ app.get('/search/local', async (req, res) => {
 // roadaddress = roadaddress.replace(/\s/g, "");
 
 app.get('/api/roadAddress', async (req, res) => {
-    var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress)
-    var road_options = {
-        uri: road_url,
-        headers: {
-            "Content-Type": "application/json",
-            "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
-            "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
+    let arrRoadAddress = []
+    for (let i = 0; i < 5; i++) {
+        var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress[i])
+        var road_options = {
+            uri: road_url,
+            headers: {
+                "Content-Type": "application/json",
+                "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
+                "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
+            }
+        }
+        try {
+            const response = await axios.get(road_url, road_options);
+            arrRoadAddress.push(response.data.addresses)
+            // res.json(response.data.addresses);
+            console.log('CoordData 전송 성공')
+        } catch (errorMessage) {
+            console.error('실패', errorMessage);
         }
     }
-    try {
-        const response = await axios.get(road_url, road_options);
-        res.json(response.data.addresses);
-        console.log('CoordData 전송 성공')
-    } catch (errorMessage) {
-        console.error('실패', errorMessage);
-    }
-});
+    res.json(arrRoadAddress);
 
+    arrRoadAddress = []
+    roadaddress = []
+});
 
 
 

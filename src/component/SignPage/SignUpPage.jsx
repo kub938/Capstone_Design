@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Copyright(props) {
@@ -33,6 +33,8 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+    const navigate = useNavigate();
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -48,7 +50,8 @@ export default function SignUp() {
         try {
             // axios.post 메소드의 두 번째 인자로 데이터 전달
             const response = await axios.post('http://localhost:4000/api/signup', userInfo);
-
+            alert('회원가입 완료');
+            navigate('/login');
             // 서버의 응답 출력
             console.log(response.data);
 
@@ -57,7 +60,6 @@ export default function SignUp() {
         }
     };
     // 나머지 컴포넌트 코드...
-
     return (
         <ThemeProvider theme={defaultTheme}>
             <Container component="main" maxWidth="xs">
