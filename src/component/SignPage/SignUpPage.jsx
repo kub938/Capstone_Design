@@ -56,6 +56,7 @@ export default function SignUp() {
             console.log(response.data);
 
         } catch (error) {
+            alert('이미 있는 이메일 입니다.')
             console.error("Error during sign up:", error);
         }
     };

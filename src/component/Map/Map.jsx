@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
-import { numberInputClasses } from '@mui/base';
 import MapList from './MapList'
 import styles from './Map.module.css'
 import cors from 'cors'
+import { CategoryContext } from '../../CategoryContext'
+
 
 function Map() {
     const [placeList, setPlaceList] = useState([])
-
     const [myLocation, setMyLocation] = useState('');
     const [position, setPosition] = useState('');
     const [data, setData] = useState('');
     const [coord, setCoord] = useState({});
+    const { category, setCategory } = useContext(CategoryContext);
+
+
     let markers = []; // 마커 정보를 담는 배열
     let infoWindows = []; // 정보창을 담는 배열
     let Coord = []
@@ -42,14 +45,14 @@ function Map() {
             try {
                 const response = await axios.get('http://localhost:4000/api/roadAddress');
                 //---------------- 리스트 좌표 5개 저장 ---------------
-                console.log(placeList)
+
                 for (let i = 0; i < 5; i++) {
                     Coord.push({
                         x: response.data[i][0].x,
                         y: response.data[i][0].y
                     })
                 }
-
+                console.log(Coord)
                 markerPositions = [
                     [Coord[0].x, Coord[0].y],
                     [Coord[1].x, Coord[1].y],
@@ -81,13 +84,14 @@ function Map() {
                 //         map: map,
                 //     });
                 // });
-                var markerPositions = [
-                    [Coord[0].x, Coord[0].y],
-                    [Coord[1].x, Coord[1].y],
-                    [Coord[2].x, Coord[2].y],
-                    [Coord[3].x, Coord[3].y],
-                    [Coord[4].x, Coord[4].y]
-                ];
+
+                // var markerPositions = [
+                //     [Coord[0].x, Coord[0].y],
+                //     [Coord[1].x, Coord[1].y],
+                //     [Coord[2].x, Coord[2].y],
+                //     [Coord[3].x, Coord[3].y],
+                //     [Coord[4].x, Coord[4].y]
+                // ];
                 console.log(marker);
 
                 var map = new naver.maps.Map('map', {
@@ -260,7 +264,11 @@ function Map() {
                 });
 
 
+                //--------------리스트 저장버튼 ---------------
 
+
+
+                //---------------------------------------
                 window.navermap_authFailure = function () {
                     // 인증 실패 시 처리 코드 작성
                     console.log("인증에 실패했습니다.");
@@ -272,8 +280,29 @@ function Map() {
             }
         }
         initMap();
-    }, [Coord]);
+    }, [markerPositions]);
 
+    let restaurant = []
+    let play = []
+    let hotel = []
+
+    const onSaveButtonClick = (index) => {
+        if (category === 'restaurant') {
+            restaurant.push(markerPositions[index])
+            alert('식당 추가')
+            console.log(category, '저장 완료')
+        }
+        else if (category === 'play') {
+            play.push(markerPositions[index])
+            alert('숙소 추가')
+            console.log(category, '저장 완료')
+        }
+        else if (category === 'hotel') {
+            hotel.push(markerPositions[index])
+            alert('숙소 추가')
+            console.log(category, '저장 완료')
+        }
+    }
 
 
 
@@ -301,8 +330,9 @@ function Map() {
     return (
         <>
             <div className={styles.container}>
-                <MapList placeList={placeList} setPlaceList={setPlaceList}></MapList>
+                <MapList placeList={placeList} setPlaceList={setPlaceList} onSaveButtonClick={onSaveButtonClick} ></MapList>
                 <div className={styles.map} id="map"></div>
+                <button className={styles.finishButton}>코스 만들기</button>
             </div>
         </>
     );

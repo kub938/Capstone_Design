@@ -30,7 +30,10 @@ app.post('/api/signup', async (req, res) => {
         // 이미 등록된 이메일인지 확인
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(409).json({ error: '이미 등록된 이메일입니다.' });
+            return res.status(410).json({ error: '이미 등록된 이메일입니다.' });
+        }
+        else if (existingUser === '') {
+            return res.status(411, '이메일을 입력해 주십시오')
         }
         if (name === "" || email === '' || password === '') {
             return res.status(500)
@@ -191,10 +194,40 @@ app.get('/search/local', async (req, res) => {
 // console.log(roadaddress)
 // roadaddress = roadaddress.replace(/\s/g, "");
 
+// app.get('/api/roadAddress', async (req, res) => {
+//     let arrRoadAddress = []
+//     for (let i = 0; i < 5; i++) {
+//         var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress[i])
+//         var road_options = {
+//             uri: road_url,
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
+//                 "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
+//             }
+//         }
+//         try {
+//             const response = await axios.get(road_url, road_options);
+//             arrRoadAddress.push(response.data.addresses)
+//             // res.json(response.data.addresses);
+//             console.log(response.data.addresses, 'CoordData 전송 성공')
+
+//         } catch (errorMessage) {
+//             console.error('실패', errorMessage);
+//         }
+//     }
+//     res.json(arrRoadAddress);
+
+//     arrRoadAddress = []
+//     roadaddress = []
+// });
+
 app.get('/api/roadAddress', async (req, res) => {
-    let arrRoadAddress = []
+    let arrRoadAddress = new Array(5);
+    let requests = [];
+
     for (let i = 0; i < 5; i++) {
-        var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress[i])
+        var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress[i]);
         var road_options = {
             uri: road_url,
             headers: {
@@ -202,20 +235,26 @@ app.get('/api/roadAddress', async (req, res) => {
                 "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
                 "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
             }
-        }
-        try {
-            const response = await axios.get(road_url, road_options);
-            arrRoadAddress.push(response.data.addresses)
-            // res.json(response.data.addresses);
-            console.log('CoordData 전송 성공')
-        } catch (errorMessage) {
-            console.error('실패', errorMessage);
-        }
-    }
-    res.json(arrRoadAddress);
+        };
 
-    arrRoadAddress = []
-    roadaddress = []
+        requests.push(
+            axios.get(road_url, road_options)
+                .then(response => {
+                    arrRoadAddress[i] = response.data.addresses;
+                    console.log(response.data.addresses, 'CoordData 전송 성공');
+                })
+                .catch(errorMessage => {
+                    console.error('실패', errorMessage);
+                })
+        );
+    }
+
+    Promise.all(requests)
+        .then(() => res.json(arrRoadAddress))
+        .catch(error => res.status(500).json({ error: 'An error occurred' }));
+
+    arrRoadAddress = [];
+    roadaddress = [];
 });
 
 
