@@ -62,7 +62,7 @@ function MapList({ placeList, setPlaceList, onSaveButtonClick }) {
                             <div>카테고리: {place.category}</div>
                             <div>주소: {place.address}</div>
                             <br />
-                            <button className={styles.btnStyle} onClick={onSaveButtonClick}>저장</button>
+                            <button className={styles.btnStyle} onClick={() => onSaveButtonClick(index)}>저장</button>
                             <hr />
                         </div>
 

@@ -1,0 +1,33 @@
+.container {
+    width: 450px;
+    height: 100vh;
+    border: 1px solid rgba(99, 97, 97, 0.242);
+    padding: 30px;
+}
+
+.headline {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.innertext {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin-bottom: 8px;
+}
+
+
+.finishButton {
+    position: absolute;
+    right: 3%;
+    bottom: 3%;
+    height: 5%;
+    width: 15%;
+    padding: 5px;
+    color: white;
+    font-size: 17px;
+    background-color: rgb(38, 178, 77);
+    cursor: pointer;
+    border-radius: 15px;
+    border: 2px solid rgb(11, 138, 43);
+}

@@ -4,21 +4,29 @@ import MapList from './MapList'
 import styles from './Map.module.css'
 import cors from 'cors'
 import { CategoryContext } from '../../CategoryContext'
-
+import { RoundaboutLeft } from '@mui/icons-material';
+import CourseResult from './CourseResult'
 
 function Map() {
+    var HOME_PATH = window.HOME_PATH || '.';
+    let map = null;
     const [placeList, setPlaceList] = useState([])
     const [myLocation, setMyLocation] = useState('');
     const [position, setPosition] = useState('');
     const [data, setData] = useState('');
     const [coord, setCoord] = useState({});
     const { category, setCategory } = useContext(CategoryContext);
-
-
+    const [restaurant, setRestaurant] = useState([]);
+    const [play, setPlay] = useState([]);
+    const [hotel, setHotel] = useState([]);
+    const [resultState, setResultState] = useState(false);
+    const [responseData, setResponseData] = useState(null);
     let markers = []; // 마커 정보를 담는 배열
     let infoWindows = []; // 정보창을 담는 배열
     let Coord = []
     let markerPositions = []
+
+
     //-------------검색한 좌표값 불러오기-------------
 
     // async function fetchData() {
@@ -61,40 +69,12 @@ function Map() {
                     [Coord[4].x, Coord[4].y]
                 ]
 
-
-
-
-                //-------------맵 초기셋팅 옵션 -----------
-                // var map = new naver.maps.Map('map', {
-                //     center: new naver.maps.LatLng(Coord[0]), //지도의 초기 중심 좌표
-                //     zoom: 16, //지도의 초기 줌 레벨
-                //     minZoom: 0, //지도의 최소 줌 레벨
-                //     zoomControl: true, //줌 컨트롤의 표시 여부
-                //     zoomControlOptions: { //줌 컨트롤의 옵션
-                //         position: naver.maps.Position.TOP_RIGHT
-                //     }
-
-                // }, []);
-
                 //------------마커 -------------
 
-                // let marker = markerPositions.map(position => {
-                //     new naver.maps.Marker({
-                //         position: new naver.maps.LatLng(position[1], position[0]),
-                //         map: map,
-                //     });
-                // });
 
-                // var markerPositions = [
-                //     [Coord[0].x, Coord[0].y],
-                //     [Coord[1].x, Coord[1].y],
-                //     [Coord[2].x, Coord[2].y],
-                //     [Coord[3].x, Coord[3].y],
-                //     [Coord[4].x, Coord[4].y]
-                // ];
                 console.log(marker);
 
-                var map = new naver.maps.Map('map', {
+                map = new naver.maps.Map('map', {
                     center: new naver.maps.LatLng(Coord[0]), //지도의 초기 중심 좌표
                     zoom: 16, //지도의 초기 줌 레벨
                     minZoom: 0, //지도의 최소 줌 레벨
@@ -105,11 +85,6 @@ function Map() {
 
                 }, []);
 
-                // var bounds = map.getBounds(),
-                //     southWest = bounds.getSW(),
-                //     northEast = bounds.getNE(),
-                //     lngSpan = northEast.lng() - southWest.lng(),
-                //     latSpan = northEast.lat() - southWest.lat();
 
                 for (var i = 0; i < markerPositions.length; i++) {
 
@@ -189,71 +164,6 @@ function Map() {
                 }
 
 
-                // const marker = new naver.maps.Marker({
-                //     pos: Coord,
-                //     map: map
-                // });
-                // const handleClick = (e) => {
-                //     marker.setPosition(e.coord);
-                // };
-
-                // map.addListener('click', handleClick);
-
-
-                //--------------정보창----------------------
-
-
-                // var contentString = [
-                //     placeList[0],
-                //     placeList[1],
-                //     placeList[2],
-                //     placeList[3],
-                //     placeList[4],
-                // ].join('<br>');
-
-                // var infowindow = new naver.maps.InfoWindow({
-                //     content: <div style="width :200px;text-align:center;padding :10px;">{contentString[0]}</div>
-                // }); // 클릭했을 때 띄워줄 정보 입력
-
-
-                //----------------------------------------------------------
-                // 생성한 마커를 담는다.
-                // markers.push(marker);
-                // infoWindows.push(infoWindow[1]); // 생성한 정보창을 담는다.
-
-
-                // naver.maps.Event.addListener(marker, "click", function (e) {
-                //     console.log('Click')
-                //     if (infowindow.getMap()) {
-                //         infowindow.close();
-                //     } else {
-                //         infowindow.open(map, marker);
-                //     }
-                // });
-
-                // infowindow.open(map, marker);
-
-
-                // function getClickHandler(seq) {
-                //     console.log(seq)
-                //     return function (e) {  // 마커를 클릭하는 부분
-                //         var marker = markers[seq], // 클릭한 마커의 시퀀스로 찾는다.
-                //             infoWindow = infoWindows[seq]; // 클릭한 마커의 시퀀스로 찾는다
-
-                //         if (infoWindow.getMap()) {
-                //             infoWindow.close();
-                //         } else {
-                //             infoWindow.open(map, marker); // 표출
-                //         }
-                //     }
-                // }
-
-                // for (var i = 0, ii = markers.length; i < ii; i++) {
-                //     console.log(markers[i], getClickHandler(i));
-                //     naver.maps.Event.addListener(markers[i], 'click', getClickHandler(i)); // 클릭한 마커 핸들러
-                // }
-
-
 
 
                 //----------------------------------------
@@ -282,29 +192,137 @@ function Map() {
         initMap();
     }, [markerPositions]);
 
-    let restaurant = []
-    let play = []
-    let hotel = []
 
-    const onSaveButtonClick = (index) => {
+    //---------------- 카테고리 저장 버튼 ---------------------
+
+
+    function onSaveButtonClick(listIndex) {
         if (category === 'restaurant') {
-            restaurant.push(markerPositions[index])
-            alert('식당 추가')
-            console.log(category, '저장 완료')
+            setRestaurant(prev => [...prev, markerPositions[listIndex]]);
+            alert('식당 추가');
+            console.log(restaurant, '저장 완료')
         }
         else if (category === 'play') {
-            play.push(markerPositions[index])
-            alert('숙소 추가')
-            console.log(category, '저장 완료')
+            setPlay(prev => [...prev, markerPositions[listIndex]]);
+            alert('놀거리 추가');
+            console.log(play, '저장 완료')
         }
         else if (category === 'hotel') {
-            hotel.push(markerPositions[index])
-            alert('숙소 추가')
-            console.log(category, '저장 완료')
+            setHotel(prev => [...prev, markerPositions[listIndex]]);
+            alert('숙소 추가');
+            console.log(hotel, '저장 완료')
         }
     }
 
+    useEffect(() => {
+        console.log(restaurant, hotel, play)
 
+    }, [restaurant]);
+
+    useEffect(() => {
+        console.log(restaurant, hotel, play)
+
+    }, [play]);
+
+    useEffect(() => {
+        console.log(restaurant, hotel, play)
+
+    }, [hotel]);
+
+
+    //--------------------코스 만들기 버튼 --------------------------
+    async function fetchDirections() {
+        let start = hotel[0];
+        let goal = restaurant[0];
+        let waypoint = play;
+        waypoint = waypoint.join('|');
+        const option = 'trafast';
+        console.log(restaurant, hotel, play)
+
+
+        // 애플리케이션 등록 시 발급받은 client id와 secret 값을 아래에 입력해주세요.
+
+        try {
+            console.log(waypoint)
+            const response = await axios.get(
+                `https://thingproxy.freeboard.io/fetch/https://naveropenapi.apigw.ntruss.com/map-direction-15/v1/driving?start=${start}&waypoints=${waypoint}&goal=${goal}&option={trafast}`,
+                // `https://naveropenapi.apigw.ntruss.com/map-direction-15/v1/driving?start=${start}&waypoint=${waypoint}&goal=${goal}&option=${option}`,
+                {
+                    headers: {
+                        "X-NCP-APIGW-API-KEY-ID": '8gyi4oq980',
+                        "X-NCP-APIGW-API-KEY": 'GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a'
+                    }
+                },
+            );
+            setResponseData(response)
+            let polylinePath = response.data.route.traoptimal[0].path
+            console.log(polylinePath)
+            let latLngPath = polylinePath.map(coord => new naver.maps.LatLng(coord[1], coord[0]));
+            console.log(latLngPath)
+
+            map = new naver.maps.Map('map', {
+                center: new naver.maps.LatLng(start), //지도의 초기 중심 좌표
+                zoom: 16, //지도의 초기 줌 레벨
+                minZoom: 0, //지도의 최소 줌 레벨
+                zoomControl: true, //줌 컨트롤의 표시 여부
+                zoomControlOptions: { //줌 컨트롤의 옵션
+                    position: naver.maps.Position.TOP_RIGHT
+                }
+
+            }, []);
+
+            var polyline = new naver.maps.Polyline({
+                map: map,
+                path: latLngPath,      //선 위치 변수배열
+                strokeColor: '#2259c7', //선 색 빨강 #빨강,초록,파랑
+                strokeOpacity: 1, //선 투명도 0 ~ 1
+                strokeWeight: 6,   //선 두께
+                strokeLineCap: 'round',
+                strokeLineJoin: 'round',
+                startIcon: 'CIRCLE',
+                endIcon: "SQUARE",
+
+            })
+
+            var marker = new naver.maps.Marker({
+                position: polylinePath[polylinePath.length - 1], //마크 표시할 위치 배열의 마지막 위치
+                map: map,
+                icon: {
+                    url: HOME_PATH + '../../../marker/finishMarker.svg',
+                    size: new naver.maps.Size(50, 50),
+                    origin: new naver.maps.Point(0, 0),
+                    anchor: new naver.maps.Point(20, 50)
+                }
+
+            });
+            var marker = new naver.maps.Marker({
+                position: polylinePath[0], //마크 표시할 위치 배열의 마지막 위치
+                map: map,
+                icon: {
+                    url: HOME_PATH + '../../../marker/marker-copy-0.svg',
+                    size: new naver.maps.Size(50, 50),
+                    origin: new naver.maps.Point(0, 0),
+                    anchor: new naver.maps.Point(20, 50)
+                }
+            });
+            for (let i = 0; i < play.length; i++) {
+                var marker = new naver.maps.Marker({
+                    position: play[i], //마크 표시할 위치 배열의 마지막 위치
+                    map: map,
+                    icon: {
+                        url: HOME_PATH + '../../../marker/marker-marker.svg',
+                        size: new naver.maps.Size(50, 50),
+                        origin: new naver.maps.Point(0, 0),
+                        anchor: new naver.maps.Point(20, 50)
+                    }
+                });
+            }
+
+            setResultState(true)
+        } catch (error) {
+            console.error('Directions data fetch failed', error);
+        }
+    }
 
     //----------- 현위치 검색 ------------------
     // const position = new naver.maps.LatLng(36.3364, 127.4582);
@@ -330,9 +348,16 @@ function Map() {
     return (
         <>
             <div className={styles.container}>
-                <MapList placeList={placeList} setPlaceList={setPlaceList} onSaveButtonClick={onSaveButtonClick} ></MapList>
+                {!resultState ? (<MapList placeList={placeList} setPlaceList={setPlaceList} onSaveButtonClick={onSaveButtonClick}></MapList>
+                ) : (
+                    <CourseResult response={responseData} />
+                )}
                 <div className={styles.map} id="map"></div>
-                <button className={styles.finishButton}>코스 만들기</button>
+                {!resultState ? (<button className={styles.finishButton} onClick={fetchDirections}>코스 만들기</button>)
+                    : (
+                        <button className={styles.finishButton}>코스 저장</button>
+                    )}
+
             </div>
         </>
     );
