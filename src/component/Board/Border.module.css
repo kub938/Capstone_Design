@@ -1,0 +1,12 @@
+.table,
+th,
+tr,
+td {
+
+    width: 80%;
+}
+
+td {
+    border: 1px solid black;
+    width: 30vw;
+}

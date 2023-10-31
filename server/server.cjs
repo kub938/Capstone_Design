@@ -9,7 +9,19 @@ const User = require('./User.cjs')
 const bcrypt = require('bcrypt');
 const path = require('path');
 const axios = require('axios')
+const Schema = mongoose.Schema;
 
+
+
+//----------------db 세팅----------------------------
+const BoardSchema = new mongoose.Schema({
+    title: String,
+    date: Date,
+    content: String
+});
+
+const Board = mongoose.model('Board', BoardSchema);
+//-----------------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -23,6 +35,46 @@ connectToDb((err) => {
         db = getDb()
     }
 })
+app.get('/api/boards', async (req, res) => {
+
+    try {
+        const boards = await Board.find({}).sort({ date: -1 }).limit(10); // 최근 게시글 10개를 가져옵니다.
+        res.json(boards);
+        console.log(boards)
+    } catch (error) {
+        console.error('Failed to fetch boards:', error);
+        res.status(500).json({ error: '게시글을 가져오는데 실패하였습니다' });
+    }
+});
+
+app.get('/api/boards/:id', async (req, res) => {
+    try {
+        const board = await Board.findById(req.params.id);
+        if (!board) {
+            return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+        }
+        res.json(board);
+    } catch (error) {
+        console.error('Failed to fetch board:', error);
+        res.status(500).json({ error: '게시글을 가져오는데 실패하였습니다' });
+    }
+});
+
+
+app.post('/api/CreateBoard', async (req, res) => {
+    const { title, content, date } = req.body;
+    try {
+        const newBoard = new Board({
+            title, content, date // 현재 시간을 저장합니다.
+        });
+        await newBoard.save();
+        res.status(201).json(newBoard); // 성공적으로 저장되면 저장된 객체를 응답에 담아 보냅니다.
+    } catch (error) {
+        console.error('Error creating board:', error);
+        res.status(500).json({ error: '게시글 저장 오류' });
+    }
+})
+
 
 app.post('/api/signup', async (req, res) => {
     const { name, email, password } = req.body;

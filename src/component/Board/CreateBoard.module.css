@@ -1,0 +1,22 @@
+.form {
+    display: flex;
+    align-items: center;
+    flex-direction: column
+}
+
+
+.inputTitle {
+    width: 80%;
+}
+
+.inputContent {
+    width: 80%;
+    height: 50vh;
+}
+
+.button {
+    color: rgb(19, 13, 13);
+    width: 80%;
+    background-color: rgb(210, 221, 255);
+    border: 1px solid black;
+}

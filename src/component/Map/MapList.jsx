@@ -56,7 +56,6 @@ function MapList({ placeList, setPlaceList, onSaveButtonClick }) {
                     {placeList.map((place, index) => (
 
                         <div className={styles.infoContents} key={index}>
-                            <div>{index}</div>
                             <div>{place.title}</div>
                             <a href={place.link}>홈페이지 바로가기</a>
                             <div>카테고리: {place.category}</div>

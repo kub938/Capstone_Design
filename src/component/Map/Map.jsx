@@ -305,18 +305,18 @@ function Map() {
                     anchor: new naver.maps.Point(20, 50)
                 }
             });
-            for (let i = 0; i < play.length; i++) {
-                var marker = new naver.maps.Marker({
-                    position: play[i], //마크 표시할 위치 배열의 마지막 위치
-                    map: map,
-                    icon: {
-                        url: HOME_PATH + '../../../marker/marker-marker.svg',
-                        size: new naver.maps.Size(50, 50),
-                        origin: new naver.maps.Point(0, 0),
-                        anchor: new naver.maps.Point(20, 50)
-                    }
-                });
-            }
+
+            var marker = new naver.maps.Marker({
+                position: play[0], //마크 표시할 위치 배열의 마지막 위치
+                map: map,
+                icon: {
+                    url: HOME_PATH + '../../../marker/marker-marker.svg',
+                    size: new naver.maps.Size(50, 50),
+                    origin: new naver.maps.Point(0, 0),
+                    anchor: new naver.maps.Point(20, 50)
+                }
+            });
+
 
             setResultState(true)
         } catch (error) {
