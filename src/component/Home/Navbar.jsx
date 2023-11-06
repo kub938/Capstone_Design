@@ -11,6 +11,8 @@ function Navbar() {
         setLogState(false);
         alert('로그아웃 되었습니다')
     };
+
+
     return (
         <div>
             <nav className={styles.navbar}>

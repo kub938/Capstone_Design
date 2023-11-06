@@ -6,6 +6,9 @@ import cors from 'cors'
 import { CategoryContext } from '../../CategoryContext'
 import { RoundaboutLeft } from '@mui/icons-material';
 import CourseResult from './CourseResult'
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 function Map() {
     var HOME_PATH = window.HOME_PATH || '.';
@@ -21,11 +24,12 @@ function Map() {
     const [hotel, setHotel] = useState([]);
     const [resultState, setResultState] = useState(false);
     const [responseData, setResponseData] = useState(null);
+    const navigate = useNavigate();
+
     let markers = []; // 마커 정보를 담는 배열
     let infoWindows = []; // 정보창을 담는 배열
     let Coord = []
     let markerPositions = []
-
 
     //-------------검색한 좌표값 불러오기-------------
 
@@ -214,6 +218,7 @@ function Map() {
         }
     }
 
+
     useEffect(() => {
         console.log(restaurant, hotel, play)
 
@@ -254,6 +259,7 @@ function Map() {
                     }
                 },
             );
+
             setResponseData(response)
             let polylinePath = response.data.route.traoptimal[0].path
             console.log(polylinePath)
@@ -324,25 +330,36 @@ function Map() {
         }
     }
 
-    //----------- 현위치 검색 ------------------
-    // const position = new naver.maps.LatLng(36.3364, 127.4582);
-    // // 위치 정보 가져오기
-    // if (navigator.geolocation) {
-    //     navigator.geolocation.getCurrentPosition(success, error);
-    // }
-    // // 위치추적에 성공했을때 위치 값을 넣어줍니다.
-    // function success(position) {
-    //     console.log('현위치 출력 성공')
-    //     setMyLocation({
-    //         latitude: position.coords.latitude,
-    //         longitude: position.coords.longitude,
-    //     });
-    // }
-    // // 위치 추적에 실패 했을때 초기값을 넣어줍니다.
-    // function error() {
-    //     console.log('현위치 검색 실패');
-    //     setMyLocation({ latitude: 37.4979517, longitude: 127.0276188 });
-    // }
+    function courseSaveButton(responseData) {
+        let email = ''
+
+        axios.get('http://localhost:4000/api/userId')
+            .then((res) => {
+                console.log('id호출 성공')
+                email = res.data // 응답 데이터에서 userId를 가져옵니다.
+                console.log(email)
+            })
+            .catch((error) => {
+                console.error('id 호출 실패', error);
+            })
+
+
+        const data = { //경로, title, 
+            //responseData
+            path: responseData.data.route.traoptimal[0].path,
+            id: email,
+        }
+        axios.post('http://localhost:4000/api/CourseData', data)
+            .then(() => {
+                alert('코스저장 완료')
+                navigate('/')
+                console.log('코스저장 성공')
+            })
+            .catch((error) => {
+                console.error('코스저장 실패', error)
+            })
+    }
+
 
 
     return (
@@ -355,7 +372,7 @@ function Map() {
                 <div className={styles.map} id="map"></div>
                 {!resultState ? (<button className={styles.finishButton} onClick={fetchDirections}>코스 만들기</button>)
                     : (
-                        <button className={styles.finishButton}>코스 저장</button>
+                        <button className={styles.finishButton} onClick={() => courseSaveButton(responseData)}>코스 저장</button>
                     )}
 
             </div>

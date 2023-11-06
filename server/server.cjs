@@ -11,6 +11,7 @@ const path = require('path');
 const axios = require('axios')
 const Schema = mongoose.Schema;
 
+let userId = ''
 
 
 //----------------db 세팅----------------------------
@@ -20,7 +21,14 @@ const BoardSchema = new mongoose.Schema({
     content: String
 });
 
+const CourseSchema = new mongoose.Schema({
+    path: [],
+    id: {},
+});
+
+
 const Board = mongoose.model('Board', BoardSchema);
+const Course = mongoose.model('Course', CourseSchema);
 //-----------------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -104,6 +112,21 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
+
+app.post('/api/CourseData', async (req, res) => {
+    const { path, id } = req.body;
+    try {
+        const newCourse = new Course({
+            path, id: userId
+        });
+        console.log(id)
+        await newCourse.save();
+        res.status(201).json(newCourse); // 성공적으로 저장되면 저장된 객체를 응답에 담아 보냅니다.
+    } catch (error) {
+        console.error('Error creating board:', error);
+        res.status(500).json({ error: '게시글 저장 오류' });
+    }
+})
 // //회원가입 데이터 추가
 // app.post('/api/signup', (req, res) => {
 //     const { name, email, password } = req.body;
@@ -121,6 +144,8 @@ app.post('/api/signup', async (req, res) => {
 // });
 
 //로그인
+
+
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     console.log("req.body: ", req.body);
@@ -136,23 +161,30 @@ app.post('/api/login', async (req, res) => {
             return res.status(402).json({ error: 'Invalid email or password' });
         }
 
+
         res.json({
             success: true,
             message: 'Logged in successfully',
             user_id: user._id,
             user_email: user.email,
         });
+
+        userId = user.email
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred during login' });
     }
 });
 
+app.get('/api/userId', (req, res) => {
+    res.json({ userId: userId });
+})
 
 
 
 //회원가입 데이터 조회
-app.get('/api/users', (req, res) => {
+app.get('/api/users/email', (req, res) => {
     User.find({})
         .then(users => {
             console.log('All users:', users);
@@ -242,37 +274,7 @@ app.get('/search/local', async (req, res) => {
 
 
 
-//---------------지번, 도로명을 사용해 주소 정보 검색----------
-// console.log(roadaddress)
-// roadaddress = roadaddress.replace(/\s/g, "");
 
-// app.get('/api/roadAddress', async (req, res) => {
-//     let arrRoadAddress = []
-//     for (let i = 0; i < 5; i++) {
-//         var road_url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=' + encodeURI(roadaddress[i])
-//         var road_options = {
-//             uri: road_url,
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "X-NCP-APIGW-API-KEY-ID": "8gyi4oq980",
-//                 "X-NCP-APIGW-API-KEY": "GcfPkL4YmbimXsu8cLvA41h7dWMQ5HhmSLIaML2a",
-//             }
-//         }
-//         try {
-//             const response = await axios.get(road_url, road_options);
-//             arrRoadAddress.push(response.data.addresses)
-//             // res.json(response.data.addresses);
-//             console.log(response.data.addresses, 'CoordData 전송 성공')
-
-//         } catch (errorMessage) {
-//             console.error('실패', errorMessage);
-//         }
-//     }
-//     res.json(arrRoadAddress);
-
-//     arrRoadAddress = []
-//     roadaddress = []
-// });
 
 app.get('/api/roadAddress', async (req, res) => {
     let arrRoadAddress = new Array(5);
