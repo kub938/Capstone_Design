@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Border.module.css'
 import axios from 'axios';
+import Navbar from '../Home/Navbar';
 
 function Board() {
     const [boards, setBoards] = useState([]);
@@ -25,34 +26,39 @@ function Board() {
     }, []);
 
     return (
-        <div>
-            <div>
-                <h3>게시판</h3>
-            </div>
+        <div >
+            <Navbar></Navbar>
+            <div className={styles.container}>
+                <div>
+                    <h3 className={styles.title}>자유 게시판</h3>
+                </div>
 
-            <table className={styles.table}>
-                <thead>
-                    <tr>
-                        <td>no</td>
-                        <td>제목</td>
-                        <td>날짜</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {boards.slice(0, 10).map((board, index) => (  // 최대 10개의 게시글만 출력합니다.
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td><Link to={`/board/${board._id}`}>{board.title}</Link></td>
-
-                            <td>{formatDate(board.date)}</td>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>제목</th>
+                            <th>글쓴이</th>
+                            <th>작성 날짜</th>
+                            <th>조회수</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-            <Link to='/createboard'>
-                글쓰기
-            </Link>
-
+                    </thead>
+                    <tbody>
+                        {boards.slice(0, 10).map((board, index) => (  // 최대 10개의 게시글만 출력합니다.
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td><Link to={`/board/${board._id}`}>{board.title}</Link></td>
+                                <td>{board.userName}</td>
+                                <td>{formatDate(board.date)}</td>
+                                <td>{board.views}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <Link to='/createboard'>
+                    <button className={styles.createBoard}>글쓰기</button>
+                </Link>
+            </div>
         </div>
     );
 }

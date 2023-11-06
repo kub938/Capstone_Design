@@ -333,7 +333,7 @@ function Map() {
     function courseSaveButton(responseData) {
         let email = ''
 
-        axios.get('http://localhost:4000/api/userId')
+        axios.get('http://localhost:4000/api/userEmail')
             .then((res) => {
                 console.log('id호출 성공')
                 email = res.data // 응답 데이터에서 userId를 가져옵니다.

@@ -11,14 +11,17 @@ const path = require('path');
 const axios = require('axios')
 const Schema = mongoose.Schema;
 
-let userId = ''
+let userEmail = ''
+let userName = ''
 
 
 //----------------db 세팅----------------------------
 const BoardSchema = new mongoose.Schema({
     title: String,
     date: Date,
-    content: String
+    userName: String,
+    content: String,
+    views: { type: Number, default: 0 },
 });
 
 const CourseSchema = new mongoose.Schema({
@@ -48,7 +51,6 @@ app.get('/api/boards', async (req, res) => {
     try {
         const boards = await Board.find({}).sort({ date: -1 }).limit(10); // 최근 게시글 10개를 가져옵니다.
         res.json(boards);
-        console.log(boards)
     } catch (error) {
         console.error('Failed to fetch boards:', error);
         res.status(500).json({ error: '게시글을 가져오는데 실패하였습니다' });
@@ -58,9 +60,13 @@ app.get('/api/boards', async (req, res) => {
 app.get('/api/boards/:id', async (req, res) => {
     try {
         const board = await Board.findById(req.params.id);
+
         if (!board) {
             return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
         }
+        board.views += 0.5;
+        await board.save();
+
         res.json(board);
     } catch (error) {
         console.error('Failed to fetch board:', error);
@@ -73,7 +79,7 @@ app.post('/api/CreateBoard', async (req, res) => {
     const { title, content, date } = req.body;
     try {
         const newBoard = new Board({
-            title, content, date // 현재 시간을 저장합니다.
+            title, content, date, userName // 현재 시간을 저장합니다.
         });
         await newBoard.save();
         res.status(201).json(newBoard); // 성공적으로 저장되면 저장된 객체를 응답에 담아 보냅니다.
@@ -117,7 +123,7 @@ app.post('/api/CourseData', async (req, res) => {
     const { path, id } = req.body;
     try {
         const newCourse = new Course({
-            path, id: userId
+            path, id: userEmail
         });
         console.log(id)
         await newCourse.save();
@@ -169,7 +175,8 @@ app.post('/api/login', async (req, res) => {
             user_email: user.email,
         });
 
-        userId = user.email
+        userEmail = user.email
+        userName = user.name
 
     } catch (error) {
         console.error(error);
@@ -177,9 +184,14 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-app.get('/api/userId', (req, res) => {
-    res.json({ userId: userId });
+app.get('/api/userEmail', (req, res) => {
+    res.json({ userEmail: userEmail });
 })
+
+// app.get('/api/userName', (req, res) => {
+//     console.log(userName)
+//     res.json({ userName: userName });
+// })
 
 
 
