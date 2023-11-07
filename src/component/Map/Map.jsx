@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 
+
 function Map() {
     var HOME_PATH = window.HOME_PATH || '.';
     let map = null;
@@ -24,7 +25,9 @@ function Map() {
     const [hotel, setHotel] = useState([]);
     const [resultState, setResultState] = useState(false);
     const [responseData, setResponseData] = useState(null);
+    const [categorySave, setCategorySave] = useState([]);
     const navigate = useNavigate();
+
 
     let markers = []; // 마커 정보를 담는 배열
     let infoWindows = []; // 정보창을 담는 배열
@@ -201,18 +204,22 @@ function Map() {
 
 
     function onSaveButtonClick(listIndex) {
+        console.log(placeList)
         if (category === 'restaurant') {
-            setRestaurant(prev => [...prev, markerPositions[listIndex]]);
+            setCategorySave([...categorySave, placeList[listIndex].title])
+            setRestaurant([...restaurant, markerPositions[listIndex]]);
             alert('식당 추가');
             console.log(restaurant, '저장 완료')
         }
         else if (category === 'play') {
-            setPlay(prev => [...prev, markerPositions[listIndex]]);
+            setCategorySave([...categorySave, placeList[listIndex].title])
+            setPlay([...play, markerPositions[listIndex]]);
             alert('놀거리 추가');
             console.log(play, '저장 완료')
         }
         else if (category === 'hotel') {
-            setHotel(prev => [...prev, markerPositions[listIndex]]);
+            setCategorySave([...categorySave, placeList[listIndex].title])
+            setHotel([...hotel, markerPositions[listIndex]]);
             alert('숙소 추가');
             console.log(hotel, '저장 완료')
         }
@@ -221,7 +228,6 @@ function Map() {
 
     useEffect(() => {
         console.log(restaurant, hotel, play)
-
     }, [restaurant]);
 
     useEffect(() => {
@@ -262,9 +268,7 @@ function Map() {
 
             setResponseData(response)
             let polylinePath = response.data.route.traoptimal[0].path
-            console.log(polylinePath)
             let latLngPath = polylinePath.map(coord => new naver.maps.LatLng(coord[1], coord[0]));
-            console.log(latLngPath)
 
             map = new naver.maps.Map('map', {
                 center: new naver.maps.LatLng(start), //지도의 초기 중심 좌표
@@ -360,7 +364,11 @@ function Map() {
             })
     }
 
-
+    function removeBoldTags(array) {
+        return array.map(item => {
+            return item.replace(/<b>|<\/b>/g, '');
+        });
+    }
 
     return (
         <>
@@ -370,6 +378,14 @@ function Map() {
                     <CourseResult response={responseData} />
                 )}
                 <div className={styles.map} id="map"></div>
+                <div className={styles.categorySave}>
+                    <div className={styles.categorySaveTitle}>저장된 장소</div>
+                    <div>{removeBoldTags(categorySave).map((item, index) => (
+                        <div key={index}>
+                            {index + 1}. {item}
+                        </div>
+                    ))}</div>
+                </div>
                 {!resultState ? (<button className={styles.finishButton} onClick={fetchDirections}>코스 만들기</button>)
                     : (
                         <button className={styles.finishButton} onClick={() => courseSaveButton(responseData)}>코스 저장</button>

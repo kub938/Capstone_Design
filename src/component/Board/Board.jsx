@@ -30,8 +30,9 @@ function Board() {
             <Navbar></Navbar>
             <div className={styles.container}>
                 <div>
-                    <h3 className={styles.title}>자유 게시판</h3>
+                    <h3 className={styles.title}>여행 후기 게시판</h3>
                 </div>
+                <p className={styles.p}>즐거웠던 여행의 기억을 이곳에 담아보세요!</p>
 
                 <table className={styles.table}>
                     <thead>

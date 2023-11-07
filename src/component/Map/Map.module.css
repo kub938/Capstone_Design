@@ -5,7 +5,25 @@
     align-items: stretch;
 }
 
+.categorySave {
+    position: absolute;
+    border: none;
+    border-right: 1px solid rgb(201, 201, 201);
+    border-bottom: 1px solid rgb(201, 201, 201);
+    border-bottom-right-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    width: 150px;
+    height: 200px;
+    margin: 0 0 0 450px;
+    overflow: auto;
+    opacity: 0.9;
+}
 
+.categorySaveTitle {
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 5px;
+}
 
 .finishButton {
     position: absolute;
@@ -16,11 +34,16 @@
     padding: 5px;
     color: white;
     font-size: 17px;
-    background-color: rgb(38, 178, 77);
+    background-color: rgb(51, 115, 236);
     cursor: pointer;
     border-radius: 15px;
-    border: 2px solid rgb(11, 138, 43);
+    border: 2px solid rgb(255, 255, 255);
 }
+
+.finishButton:hover {
+    background-color: rgb(115, 177, 252);
+}
+
 
 .map {
     position: relative;

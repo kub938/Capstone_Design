@@ -1,3 +1,8 @@
+.h1 {
+    font-size: 25px;
+    margin: 20px 0 20px 0;
+}
+
 .form {
     display: flex;
     align-items: center;
@@ -6,17 +11,24 @@
 
 
 .inputTitle {
+    border: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid rgb(193, 193, 193);
     width: 80%;
+    height: 40px;
 }
 
 .inputContent {
+    border: none;
     width: 80%;
     height: 50vh;
+    margin-bottom: 2px;
 }
 
 .button {
     color: rgb(19, 13, 13);
     width: 80%;
     background-color: rgb(210, 221, 255);
-    border: 1px solid black;
+    border: 1px solid rgb(163, 163, 163);
+    border-radius: 7px;
 }

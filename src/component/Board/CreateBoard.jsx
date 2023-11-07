@@ -2,6 +2,7 @@ import * as React from 'react';
 import styles from './CreateBoard.module.css'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../Home/Navbar'
 
 function CreateBoard() {
     const navigate = useNavigate();
@@ -43,12 +44,12 @@ function CreateBoard() {
 
     return (
         <div>
-
-            <form className={styles.form} >
-                <div>글쓰기</div>
-                <input type="text" placeholder='제목' className={styles.inputTitle} onChange={onTitleChange} />
-                <input type="text" placeholder='내용' className={styles.inputContent} onChange={onContentChange} />
-                <button className={styles.button} onClick={onClick}>저장</button>
+            <Navbar></Navbar>
+            <form className={styles.form} onSubmit={onClick} >
+                <div className={styles.h1}>글쓰기</div>
+                <input required type="text" placeholder='제목' className={styles.inputTitle} onChange={onTitleChange} />
+                <input required type="text" placeholder='내용을 입력해 주세요' className={styles.inputContent} onChange={onContentChange} />
+                <button className={styles.button} >저장</button>
             </form>
         </div>
     );

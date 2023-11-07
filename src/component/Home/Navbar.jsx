@@ -23,7 +23,7 @@ function Navbar() {
                     <div className={styles.navElements}>
                         <ul>
                             <li><NavLink to="/map">코스추천</NavLink></li>
-                            <li><NavLink to="/board">게시판</NavLink></li>
+                            <li><NavLink to="/board">여행후기</NavLink></li>
                             {!logstate ? (<li><NavLink to="/login" >로그인</NavLink></li>
                             ) : (
                                 <li><button onClick={handleLogout}>로그아웃</button></li>

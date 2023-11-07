@@ -2,17 +2,50 @@
     width: 450px;
     height: 100vh;
     border: 1px solid rgba(99, 97, 97, 0.242);
+    overflow: auto;
 }
 
 .btnStyle {
     width: 18%;
     padding: 5px;
+
+    margin: 5px 0 0 290px;
     color: white;
     font-size: 17px;
     background-color: rgb(128, 207, 207);
     cursor: pointer;
     border-radius: 15px;
     border: 1px solid rgb(128, 207, 207);
+}
+
+.title {
+    font-size: 19px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.btnStyle:hover {
+    background-color: rgb(216, 254, 255);
+    color: rgb(123, 123, 123);
+}
+
+.form {
+    justify-content: center;
+    display: flex;
+}
+
+.button1,
+.button2,
+.button3 {
+    margin: 15px 23px 0 20px;
+    width: 18%;
+    padding: 5px;
+    color: black;
+    font-size: 17px;
+    cursor: pointer;
+    border-radius: 15px;
+    border: 1px solid rgb(128, 207, 207);
+    border: 1px solid rgb(51, 115, 236);
 }
 
 
